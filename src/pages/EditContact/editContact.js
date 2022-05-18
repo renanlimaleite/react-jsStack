@@ -1,3 +1,9 @@
+import { PageHeader } from '../../components/PageHeader/pageHeader'
+
 export function EditContact () {
-  return 'editcontact'
+  return (
+    <PageHeader
+      title="Editar Renan Leite"
+    />
+  )
 }
