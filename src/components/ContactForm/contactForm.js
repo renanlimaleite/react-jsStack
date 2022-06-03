@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
 import useErrors from '../../hooks/useErrors'
+import formatPhone from '../../utils/formatPhone'
 import isEmailValid from '../../utils/isEmailValid'
 import { Button } from '../Button'
 import { FormGroup } from '../FormGroup'
@@ -14,7 +15,9 @@ export function ContactForm ({ buttonLabel }) {
   const [phone, setPhone] = useState('')
   const [category, setCategory] = useState('')
 
-  const { setError, removeError, getErrorMessageByFieldName } = useErrors()
+  const { setError, removeError, getErrorMessageByFieldName, errors } = useErrors()
+
+  const isFormValid = (name && errors.length === 0)
 
   function handleNameChange (event) {
     setName(event.target.value)
@@ -41,13 +44,17 @@ export function ContactForm ({ buttonLabel }) {
     console.log({
       name,
       email,
-      phone,
+      phone: phone.replace(/\D/g, ''),
       category
     })
   }
 
+  function handlePhoneChange (event) {
+    setPhone(formatPhone(event.target.value))
+  }
+
   return (
-    <Form onSubmit={(e) => handleSubmit(e)}>
+    <Form onSubmit={(e) => handleSubmit(e)} noValidate>
       <FormGroup error={getErrorMessageByFieldName('name')}>
         <Input
           error={getErrorMessageByFieldName('name')}
@@ -58,6 +65,7 @@ export function ContactForm ({ buttonLabel }) {
       </FormGroup>
       <FormGroup error={getErrorMessageByFieldName('email')}>
         <Input
+          type="email"
           error={getErrorMessageByFieldName('email')}
           placeholder="E-mail"
           value={email}
@@ -68,7 +76,8 @@ export function ContactForm ({ buttonLabel }) {
         <Input
           placeholder="Telefone"
           value={phone}
-          onChange={event => setPhone(event.target.value)}
+          onChange={handlePhoneChange}
+          maxLength="15"
         />
       </FormGroup>
       <FormGroup>
@@ -83,7 +92,7 @@ export function ContactForm ({ buttonLabel }) {
       </FormGroup>
 
       <ButtonContainer>
-        <Button type="submit">{ buttonLabel }</Button>
+        <Button type="submit" disabled={!isFormValid}>{ buttonLabel }</Button>
       </ButtonContainer>
     </Form>
   )
