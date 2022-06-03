@@ -1,9 +1,9 @@
-import { Card, Container, Header, InputSearchContainer, ListContainer } from './styles'
-
+import { Link } from 'react-router-dom'
 import arrow from '../../assets/images/icons/arrow.svg'
 import edit from '../../assets/images/icons/edit.svg'
 import trash from '../../assets/images/icons/trash.svg'
-import { Link } from 'react-router-dom'
+import { Card, Container, Header, InputSearchContainer, ListContainer } from './styles'
+
 // import { Modal } from '../../components/Modal'
 // import { Loader } from '../../components/Loader/Loader'
 
