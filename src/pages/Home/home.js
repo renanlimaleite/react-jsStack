@@ -1,54 +1,89 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import arrow from '../../assets/images/icons/arrow.svg'
 import edit from '../../assets/images/icons/edit.svg'
 import trash from '../../assets/images/icons/trash.svg'
-import { Card, Container, Header, InputSearchContainer, ListContainer } from './styles'
+import { Card, Container, Header, InputSearchContainer, ListHeader } from './styles'
 
 // import { Modal } from '../../components/Modal'
 // import { Loader } from '../../components/Loader/Loader'
 
 export function Home () {
+  const [contacts, setContacts] = useState([])
+  const [orderBy, setOrderBy] = useState('asc')
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const filteredContacts = contacts.filter((contact) => (
+    // contact.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    contact.name.toLowerCase().includes(searchTerm.toLowerCase())
+  ))
+
+  useEffect(() => {
+    fetch(`http://localhost:3001/contacts?orderBy=${orderBy}`)
+      .then(async (response) => {
+        const json = await response.json()
+        setContacts(json)
+      })
+      .catch(error => {
+        console.log('error', error)
+      })
+  }, [orderBy])
+
+  function handleToggleOrderBy () {
+    setOrderBy(prevState => prevState === 'asc' ? 'desc' : 'asc')
+  }
+
+  function handleChangeSearchTerm (event) {
+    setSearchTerm(event?.target?.value)
+  }
+
   return (
     <Container>
-      {/* <Loader /> */}
-      {/* <Modal danger /> */}
       <InputSearchContainer>
-        <input type="text" placeholder="Pesquisar contato" />
+        <input
+          value={searchTerm}
+          onChange={handleChangeSearchTerm}
+          type="text"
+          placeholder="Pesquisar contato"
+        />
       </InputSearchContainer>
 
       <Header>
-        <strong>3 contatos</strong>
+        <strong>{filteredContacts.length} {filteredContacts.length === 1 ? ' contato' : ' contatos'}</strong>
         <Link to="/new">Novo contato</Link>
       </Header>
 
-      <ListContainer>
-        <header>
-          <button type="button">
-            <span>Nome</span>
-            <img src={arrow} alt="Arrow to reoder" />
-          </button>
-        </header>
-
-        <Card>
-          <div className="info">
-            <div className="contact-name">
-              <strong>Renan Leite</strong>
-              <small>instagram</small>
-            </div>
-            <span>renan@renan.com</span>
-            <span>(21) 99999-9999</span>
-          </div>
-
-          <div className="actions">
-            <Link to="/edit/123">
-              <img src={edit} alt="Edit a contact" />
-            </Link>
-            <button type="button">
-              <img src={trash} alt="Delete a contact" />
+      {!!filteredContacts.length && (
+        <ListHeader orderBy={orderBy}>
+            <button type="button" onClick={handleToggleOrderBy}>
+              <span>Nome</span>
+              <img src={arrow} alt="Arrow to reoder" />
             </button>
-          </div>
+        </ListHeader>
+      )}
+
+        {!!filteredContacts.length && filteredContacts.map(contact => (
+          <Card key={contact.id}>
+            <div className="info">
+              <div className="contact-name">
+                <strong>{contact.name}</strong>
+                {contact.categorie_name && <small>{contact.categorie_name}</small>}
+              </div>
+              <span>{contact.email}</span>
+              <span>{contact.phone}</span>
+            </div>
+
+            <div className="actions">
+              <Link to={`/edit/${contact.id}`}>
+                <img src={edit} alt="Edit a contact" />
+              </Link>
+              <button type="button">
+                <img src={trash} alt="Delete a contact" />
+              </button>
+            </div>
         </Card>
-      </ListContainer>
+        ))}
+
     </Container>
   )
 }
