@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import arrow from '../../assets/images/icons/arrow.svg'
 import edit from '../../assets/images/icons/edit.svg'
@@ -13,10 +13,12 @@ export function Home () {
   const [orderBy, setOrderBy] = useState('asc')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const filteredContacts = contacts.filter((contact) => (
-    // contact.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-    contact.name.toLowerCase().includes(searchTerm.toLowerCase())
-  ))
+  const filteredContacts = useMemo(() => {
+    return contacts.filter((contact) => (
+      // contact.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+      contact.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ))
+  }, [contacts, searchTerm])
 
   useEffect(() => {
     fetch(`http://localhost:3001/contacts?orderBy=${orderBy}`)
